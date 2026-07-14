@@ -205,6 +205,18 @@
         .btn-save:hover {
             opacity: 0.9;
         }
+        .btn-chrome-notif {
+            background-color: #3b82f6;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 8px;
+            font-size: 0.9rem;
+        }
         .status-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -261,13 +273,16 @@
 
         <!-- NEW SECTION: AUTO NOTIFICATION SYSTEM -->
         <div class="section-card">
-            <h2>XAU/USDT Auto Mail Dispatcher (1m Support/Resistance Engine)</h2>
+            <h2>XAU/USDT Auto Dispatcher & Chrome Notification Engine</h2>
             <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">
-                Scans 1m Gold chart data over the last 30 minutes. Correlates it to the 1-hour major trend direction. Automated mail will be dispatched to <strong>nayemdataentry1@gmail.com</strong>.
+                Scans 1m Gold chart data over the last 30 minutes. Correlates it to the 1-hour major trend direction. Automated alerts will trigger Chrome system notifications and dispatch mail to <strong>nayemdataentry1@gmail.com</strong>.
             </p>
             
+            <!-- System Integration Buttons -->
+            <button class="btn-chrome-notif" id="btn-request-notif" onclick="enableChromeNotifications()">🔔 Enable Chrome Browser Notifications</button>
+
             <!-- Credentials Config Setup -->
-            <div class="config-row">
+            <div class="config-row" style="margin-top: 12px;">
                 <div class="config-group">
                     <label>EmailJS Public Key</label>
                     <input type="text" id="ej-pub-key" placeholder="Paste Public Key" value="">
@@ -307,7 +322,7 @@
 
             <!-- Operational System Logs -->
             <div class="log-box" id="sys-log">
-                [System] Waiting for user keys to activate dispatch loop...
+                [System] Please tap "Enable Chrome Browser Notifications" to permit local alerts.
             </div>
         </div>
         
@@ -597,7 +612,7 @@
             document.getElementById('calc-hour-trend').className = "status-val " + (current1HourTrend === "BULLISH" ? "text-green" : "text-red");
         }
 
-        // --- NEW IMPLEMENTATION: EMAIL ENGINE & AUTOMATION ---
+        // --- NEW IMPLEMENTATION: EMAIL & CHROME AUTO NOTIFICATION SYSTEM ---
         let gold1mHistory = []; // Simulates structural 30-minute ticks
         let supportPrice = 0.00;
         let resistancePrice = 0.00;
@@ -610,6 +625,32 @@
             const timestamp = new Date().toLocaleTimeString();
             logBox.innerHTML += `<div>[${timestamp}] ${message}</div>`;
             logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        // CHROME BROWSER NOTIFICATION PERMISSION GESTURE
+        function enableChromeNotifications() {
+            if (!("Notification" in window)) {
+                alert("This browser does not support desktop or system notifications.");
+                return;
+            }
+
+            Notification.requestPermission().then((permission) => {
+                const btn = document.getElementById('btn-request-notif');
+                if (permission === "granted") {
+                    addLog("System Notification permission granted.");
+                    btn.innerText = "✓ System Notifications Enabled";
+                    btn.style.backgroundColor = "var(--bullish-green)";
+                    // Fire a success test notification
+                    new Notification("XAU/USDT Alert System", {
+                        body: "Live trading notification channel is now running!",
+                        icon: "https://cdn-icons-png.flaticon.com/512/272/272525.png"
+                    });
+                } else if (permission === "denied") {
+                    addLog("Notification permission was denied. Please adjust your Chrome Site Settings.");
+                    btn.innerText = "❌ Notifications Denied";
+                    btn.style.backgroundColor = "var(--bearish-red)";
+                }
+            });
         }
 
         function saveEmailCredentials() {
@@ -645,7 +686,15 @@
                 document.getElementById('ej-tpl-id').value = tpl;
                 emailjs.init({ publicKey: pub });
                 isMailEngineConfigured = true;
-                addLog("Credentials loaded from localStorage. Engine active!");
+                addLog("EmailJS credentials loaded. Loop active!");
+            }
+            
+            // Check current notification state to style button accordingly
+            if ("Notification" in window && Notification.permission === "granted") {
+                const btn = document.getElementById('btn-request-notif');
+                btn.innerText = "✓ System Notifications Enabled";
+                btn.style.backgroundColor = "var(--bullish-green)";
+                addLog("Active notification session detected.");
             }
         }
 
@@ -682,45 +731,69 @@
         }
 
         function checkTradingConditions() {
-            if (!isMailEngineConfigured) return;
             if (mailCooldownActive) return;
 
-            // Scenario A: Trend is DOWN and price hits Resistance
+            // Scenario A: Trend is DOWN and 1m price hits/crosses 30m Resistance
             if (current1HourTrend === "BEARISH" && currentGoldPrice >= resistancePrice) {
-                sendTradeAlertEmail("SELL / SHORT", currentGoldPrice, resistancePrice, "Resistance");
+                triggerTradeAlert("SELL / SHORT", currentGoldPrice, resistancePrice, "Resistance");
             } 
-            // Scenario B: Trend is UP and price hits Support
+            // Scenario B: Trend is UP and 1m price hits/crosses 30m Support
             else if (current1HourTrend === "BULLISH" && currentGoldPrice <= supportPrice) {
-                sendTradeAlertEmail("BUY / LONG", currentGoldPrice, supportPrice, "Support");
+                triggerTradeAlert("BUY / LONG", currentGoldPrice, supportPrice, "Support");
             }
         }
 
-        function sendTradeAlertEmail(action, price, boundaryPrice, boundaryName) {
+        function triggerTradeAlert(action, price, boundaryPrice, boundaryName) {
             mailCooldownActive = true;
-            addLog(`Executing criteria! dispatching trade signal to nayemdataentry1@gmail.com...`);
+            const alertTitle = `🔴 GOLD SIGNAL: ${action}`;
+            const alertBody = `1H Trend: ${current1HourTrend}. 1m price ($${price}) touched 30m ${boundaryName} ($${boundaryPrice}).`;
 
-            const serviceId = document.getElementById('ej-srv-id').value.trim();
-            const templateId = document.getElementById('ej-tpl-id').value.trim();
+            addLog(`CRITERIA MET! Dispatching Chrome system Notification & Email Alert...`);
 
-            const templateParams = {
-                to_email: "nayemdataentry1@gmail.com",
-                subject: `GOLD [XAU/USDT] - ${action} SIGNAL`,
-                message: `Alert: 1-hour major trend is ${current1HourTrend}. The live 1-minute gold candle price ($${price}) has touched its 30-minute structural ${boundaryName} ($${boundaryPrice}). Action recommended: Open a ${action} trade immediately.`
-            };
-
-            emailjs.send(serviceId, templateId, templateParams)
-                .then(() => {
-                    addLog(`Email successfully sent! Cooldown active for 15 minutes.`);
-                    // Activate 15-minute standard cooldown to protect limits
-                    setTimeout(() => {
-                        mailCooldownActive = false;
-                        addLog("Cooldown expired. Scanning engine is hot again.");
-                    }, 900000); 
-                })
-                .catch((error) => {
-                    addLog(`Mail dispatch failure: ` + JSON.stringify(error));
-                    mailCooldownActive = false; // Reset block on failure to retry
+            // 1. CHROME BROWSER SYSTEM NOTIFICATION
+            if ("Notification" in window && Notification.permission === "granted") {
+                new Notification(alertTitle, {
+                    body: alertBody,
+                    icon: "https://cdn-icons-png.flaticon.com/512/272/272525.png",
+                    requireInteraction: true // Keeps the alert on screen until you dismiss it
                 });
+                addLog("Chrome system notification sent successfully!");
+            } else {
+                addLog("Chrome notification skipped (Permission not granted/supported).");
+            }
+
+            // 2. EMAILJS AUTOMATED EMAIL DISPATCH
+            if (isMailEngineConfigured) {
+                const serviceId = document.getElementById('ej-srv-id').value.trim();
+                const templateId = document.getElementById('ej-tpl-id').value.trim();
+
+                const templateParams = {
+                    to_email: "nayemdataentry1@gmail.com",
+                    subject: `GOLD [XAU/USDT] - ${action} SIGNAL`,
+                    message: `Alert: 1-hour major trend is ${current1HourTrend}. The live 1-minute gold candle price ($${price}) has touched its 30-minute structural ${boundaryName} ($${boundaryPrice}). Action recommended: Open a ${action} trade immediately.`
+                };
+
+                emailjs.send(serviceId, templateId, templateParams)
+                    .then(() => {
+                        addLog(`Email successfully sent to nayemdataentry1@gmail.com! Cooldown active for 15m.`);
+                        activateCooldown();
+                    })
+                    .catch((error) => {
+                        addLog(`Mail dispatch failure: ` + JSON.stringify(error));
+                        activateCooldown(); // Activate cooldown anyway to prevent endless loops
+                    });
+            } else {
+                addLog("Email dispatch skipped (Credentials not configured).");
+                activateCooldown();
+            }
+        }
+
+        function activateCooldown() {
+            // Activate 15-minute standard cooldown to prevent notification spam
+            setTimeout(() => {
+                mailCooldownActive = false;
+                addLog("Cooldown expired. Alert engine is active again.");
+            }, 900000); 
         }
 
         // Initialization execution trigger block
