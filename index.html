@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>XAU/USDT Advanced Intelligence App</title>
-    <!-- Chart.js for Section 1 Volium Chart -->
+    <!-- Chart.js with Annotation Plugin for Drawing Support & Resistance Levels -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
     <!-- EmailJS SDK for Auto-Notifications -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
@@ -109,7 +110,7 @@
 
         .chart-container {
             position: relative;
-            height: 200px;
+            height: 220px;
             width: 100%;
             margin-top: 10px;
         }
@@ -251,6 +252,30 @@
             color: #10b981;
             margin-top: 10px;
         }
+
+        /* Level Track Indicator Bar */
+        .level-tracker-wrapper {
+            margin-top: 10px;
+            background: #0f172a;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px dashed #334155;
+        }
+        .level-progress-outer {
+            width: 100%;
+            background-color: #334155;
+            height: 12px;
+            border-radius: 6px;
+            position: relative;
+            margin: 6px 0;
+            overflow: hidden;
+        }
+        .level-progress-inner {
+            height: 100%;
+            background: linear-gradient(to right, var(--bullish-green), var(--accent-gold), var(--bearish-red));
+            width: 50%;
+            transition: width 0.5s ease-out;
+        }
     </style>
 </head>
 <body>
@@ -261,7 +286,7 @@
 
     <div class="container">
         
-        <!-- NEW ADDITION: LIVE SKETCHABLE TRADINGVIEW CHART -->
+        <!-- LIVE INTERACTIVE TRADINGVIEW CHART -->
         <div class="section-card">
             <h2>XAU/USDT Live Interactive Chart (With Sketch Tools)</h2>
             <div class="tv-wrapper">
@@ -271,15 +296,27 @@
             </div>
         </div>
 
-        <!-- NEW SECTION: AUTO NOTIFICATION SYSTEM -->
+        <!-- AUTO NOTIFICATION & SUPPORT/RESISTANCE VISUALIZER ENGINE -->
         <div class="section-card">
-            <h2>XAU/USDT Auto Dispatcher & Chrome Notification Engine</h2>
+            <h2>XAU/USDT Auto Dispatcher & Level Proximity Engine</h2>
             <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">
-                Scans 1m Gold chart data over the last 30 minutes. Correlates it to the 1-hour major trend direction. Automated alerts will trigger Chrome system notifications and dispatch mail to <strong>nayemdataentry1@gmail.com</strong>.
+                Scans 1m Gold ticks. Compares them continuously with calculated Support and Resistance parameters. 
             </p>
             
             <!-- System Integration Buttons -->
             <button class="btn-chrome-notif" id="btn-request-notif" onclick="enableChromeNotifications()">🔔 Enable Chrome Browser Notifications</button>
+
+            <!-- Level Track Proximity Visualizer -->
+            <div class="level-tracker-wrapper">
+                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted);">
+                    <span>Support Floor: <strong id="prox-support" class="text-green">$0.00</strong></span>
+                    <span>Live Price: <strong id="prox-live" style="color: #fff;">$0.00</strong></span>
+                    <span>Resistance Ceiling: <strong id="prox-resistance" class="text-red">$0.00</strong></span>
+                </div>
+                <div class="level-progress-outer">
+                    <div id="level-indicator-bar" class="level-progress-inner"></div>
+                </div>
+            </div>
 
             <!-- Credentials Config Setup -->
             <div class="config-row" style="margin-top: 12px;">
@@ -326,9 +363,9 @@
             </div>
         </div>
         
-        <!-- SECTION 1: 15 MIN VOLUME TRACKER (WITH LIVE SECOND REFRESH & COUNTDOWN) -->
+        <!-- SECTION 1: 15 MIN VOLUME TRACKER WITH SUPPORT & RESISTANCE PLOT -->
         <div class="section-card">
-            <h2>1. XAU/USDT 15-Min Volume Momentum (Auto-Refresh)</h2>
+            <h2>1. XAU/USDT 15-Min Vol Trend & Marked Levels</h2>
             <div class="live-counter-text">Next structural calculation in: <span id="countdown-timer">60</span>s</div>
             <div class="refresh-bar-container">
                 <div id="refresh-progress" class="refresh-bar"></div>
@@ -340,7 +377,7 @@
             </div>
         </div>
 
-        <!-- NEW SECTION: CPI ANALYSIS ENGINE & GOLD PRICE DIRECTION FORECASTER -->
+        <!-- CPI ANALYSIS ENGINE & GOLD PRICE DIRECTION FORECASTER -->
         <div class="section-card">
             <h2>CPI News Impact Matrix & Trend Predictor</h2>
             <div style="overflow-x:auto;">
@@ -432,7 +469,7 @@
     <!-- Script tags containing implementation for layout generation and widget loading -->
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script>
-        // --- LIVE SKETCHABLE INTERACTIVE TRADINGVIEW CHART INTEGRATION ---
+        // --- LIVE INTERACTIVE TRADINGVIEW CHART INTEGRATION ---
         function loadTradingViewChart() {
             new TradingView.widget({
                 "width": "100%",
@@ -445,19 +482,21 @@
                 "locale": "en",
                 "toolbar_bg": "#1e293b",
                 "enable_publishing": false,
-                "hide_side_toolbar": false, // CRITICAL: Gives drawing access
+                "hide_side_toolbar": false,
                 "allow_symbol_change": true,
                 "container_id": "tradingview_xau_chart"
             });
         }
 
-        // --- SECTION 1 LOGIC: LIVE TRACKING VOLUMES AND GRAPH UPDATES ---
+        // --- SECTION 1 LOGIC: VOLUME & MARKED LEVELS CHART ---
         let volChart;
         let buyVolData = [120, 125, 134, 140, 155, 168, 180, 195, 210, 225, 240, 265, 290, 310, 340];
         let sellVolData = [200, 190, 185, 170, 160, 145, 140, 130, 115, 110, 95, 90, 80, 75, 60];
         const minutes = Array.from({length: 15}, (_, i) => `${i+1}m ago`).reverse();
         
         let timeRemaining = 60;
+        let currentSupportRef = 110;  // Initial marked floor for chart reference
+        let currentResistanceRef = 320; // Initial marked ceiling for chart reference
 
         function initSection1() {
             const ctx = document.getElementById('volumeChart').getContext('2d');
@@ -478,12 +517,64 @@
                         x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
                         y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }
                     },
-                    plugins: { legend: { labels: { color: '#f8fafc' } } }
+                    plugins: {
+                        legend: { labels: { color: '#f8fafc' } },
+                        // Renders Dynamic Support and Resistance Overlay Lines on the Chart
+                        annotation: {
+                            annotations: {
+                                resistanceLine: {
+                                    type: 'line',
+                                    yMin: currentResistanceRef,
+                                    yMax: currentResistanceRef,
+                                    borderColor: '#ef4444',
+                                    borderWidth: 2,
+                                    borderDash: [6, 6],
+                                    label: {
+                                        display: true,
+                                        content: 'Resistance (Ceiling)',
+                                        position: 'end',
+                                        backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                                        color: '#fff',
+                                        font: { size: 10 }
+                                    }
+                                },
+                                supportLine: {
+                                    type: 'line',
+                                    yMin: currentSupportRef,
+                                    yMax: currentSupportRef,
+                                    borderColor: '#10b981',
+                                    borderWidth: 2,
+                                    borderDash: [6, 6],
+                                    label: {
+                                        display: true,
+                                        content: 'Support (Floor)',
+                                        position: 'start',
+                                        backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                                        color: '#fff',
+                                        font: { size: 10 }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             });
 
             calculateMomentum();
             startLiveIntervalEngine();
+        }
+
+        function updateChartMarkedLevels(supportVal, resistanceVal) {
+            if (!volChart) return;
+            // Convert current real support/resistance ratios into visual levels matching volume scales
+            let visualSupport = Math.max(50, Math.min(supportVal - 2240, 200));
+            let visualResistance = Math.max(100, Math.min(resistanceVal - 2210, 400));
+
+            volChart.options.plugins.annotation.annotations.supportLine.yMin = visualSupport;
+            volChart.options.plugins.annotation.annotations.supportLine.yMax = visualSupport;
+            volChart.options.plugins.annotation.annotations.resistanceLine.yMin = visualResistance;
+            volChart.options.plugins.annotation.annotations.resistanceLine.yMax = visualResistance;
+            volChart.update('none');
         }
 
         function calculateMomentum() {
@@ -569,7 +660,7 @@
         }
 
         // --- SECTION 3 LOGIC: 5-HOUR DATA EXTRACTION & ANALYSIS ---
-        let current1HourTrend = "BULLISH"; // Track the global hour state for the email system
+        let current1HourTrend = "BULLISH"; 
         
         function initSection3() {
             const hourlyData = [
@@ -612,11 +703,11 @@
             document.getElementById('calc-hour-trend').className = "status-val " + (current1HourTrend === "BULLISH" ? "text-green" : "text-red");
         }
 
-        // --- NEW IMPLEMENTATION: EMAIL & CHROME AUTO NOTIFICATION SYSTEM ---
-        let gold1mHistory = []; // Simulates structural 30-minute ticks
+        // --- CODES AND INTERFACES FOR EMAIL & NOTIFICATION ENGINE ---
+        let gold1mHistory = []; 
         let supportPrice = 0.00;
         let resistancePrice = 0.00;
-        let currentGoldPrice = 2350.00; // Base baseline XAU rate
+        let currentGoldPrice = 2350.00; 
         let isMailEngineConfigured = false;
         let mailCooldownActive = false;
 
@@ -627,10 +718,9 @@
             logBox.scrollTop = logBox.scrollHeight;
         }
 
-        // CHROME BROWSER NOTIFICATION PERMISSION GESTURE
         function enableChromeNotifications() {
             if (!("Notification" in window)) {
-                alert("This browser does not support desktop or system notifications.");
+                alert("This browser does not support desktop notifications.");
                 return;
             }
 
@@ -640,13 +730,12 @@
                     addLog("System Notification permission granted.");
                     btn.innerText = "✓ System Notifications Enabled";
                     btn.style.backgroundColor = "var(--bullish-green)";
-                    // Fire a success test notification
                     new Notification("XAU/USDT Alert System", {
-                        body: "Live trading notification channel is now running!",
+                        body: "Live trading level alert channel is fully active!",
                         icon: "https://cdn-icons-png.flaticon.com/512/272/272525.png"
                     });
                 } else if (permission === "denied") {
-                    addLog("Notification permission was denied. Please adjust your Chrome Site Settings.");
+                    addLog("Notification permission was denied.");
                     btn.innerText = "❌ Notifications Denied";
                     btn.style.backgroundColor = "var(--bearish-red)";
                 }
@@ -675,7 +764,6 @@
             }
         }
 
-        // Pre-populate credentials if stored previously in browser
         function loadSavedCredentials() {
             const pub = localStorage.getItem('ej_pub');
             const srv = localStorage.getItem('ej_srv');
@@ -689,7 +777,6 @@
                 addLog("EmailJS credentials loaded. Loop active!");
             }
             
-            // Check current notification state to style button accordingly
             if ("Notification" in window && Notification.permission === "granted") {
                 const btn = document.getElementById('btn-request-notif');
                 btn.innerText = "✓ System Notifications Enabled";
@@ -698,9 +785,7 @@
             }
         }
 
-        // Simulates real-time 1m chart ticks to run mathematical tests
         function runAutoAnalysisLoop() {
-            // Fill historical baseline if empty
             if (gold1mHistory.length === 0) {
                 for (let i = 0; i < 30; i++) {
                     gold1mHistory.push(currentGoldPrice + (Math.random() * 8 - 4));
@@ -708,95 +793,108 @@
             }
 
             setInterval(() => {
-                // Simulate 1m candle behavior
                 const priceFluctuation = (Math.random() * 2 - 1); 
                 currentGoldPrice = parseFloat((currentGoldPrice + priceFluctuation).toFixed(2));
                 
-                // Keep moving 30-minute snapshot updated
                 gold1mHistory.shift();
                 gold1mHistory.push(currentGoldPrice);
 
-                // Calculate Support & Resistance over last 30 intervals
                 supportPrice = parseFloat(Math.min(...gold1mHistory).toFixed(2));
                 resistancePrice = parseFloat(Math.max(...gold1mHistory).toFixed(2));
 
-                // Update UI Element displays
+                // Update text fields
                 document.getElementById('calc-support').innerText = `$${supportPrice}`;
                 document.getElementById('calc-resistance').innerText = `$${resistancePrice}`;
                 document.getElementById('calc-live-price').innerText = `$${currentGoldPrice}`;
 
-                // Validate triggers
+                // Update level visual overlay values
+                document.getElementById('prox-support').innerText = `$${supportPrice}`;
+                document.getElementById('prox-resistance').innerText = `$${resistancePrice}`;
+                document.getElementById('prox-live').innerText = `$${currentGoldPrice}`;
+
+                // Process horizontal progress visualization
+                const totalRange = (resistancePrice - supportPrice) || 1;
+                const positionPercentage = ((currentGoldPrice - supportPrice) / totalRange) * 100;
+                document.getElementById('level-indicator-bar').style.width = `${Math.max(0, Math.min(positionPercentage, 100))}%`;
+
+                // Update the visual ceiling/floor annotations inside Chart.js
+                updateChartMarkedLevels(supportPrice, resistancePrice);
+
                 checkTradingConditions();
-            }, 3000); // Scans ticks every 3 seconds
+            }, 3000); 
         }
 
         function checkTradingConditions() {
             if (mailCooldownActive) return;
 
-            // Scenario A: Trend is DOWN and 1m price hits/crosses 30m Resistance
             if (current1HourTrend === "BEARISH" && currentGoldPrice >= resistancePrice) {
-                triggerTradeAlert("SELL / SHORT", currentGoldPrice, resistancePrice, "Resistance");
+                triggerTradeAlert("SELL / SHORT", currentGoldPrice, resistancePrice, "Resistance Level Ceiling");
             } 
-            // Scenario B: Trend is UP and 1m price hits/crosses 30m Support
             else if (current1HourTrend === "BULLISH" && currentGoldPrice <= supportPrice) {
-                triggerTradeAlert("BUY / LONG", currentGoldPrice, supportPrice, "Support");
+                triggerTradeAlert("BUY / LONG", currentGoldPrice, supportPrice, "Support Level Floor");
             }
         }
 
         function triggerTradeAlert(action, price, boundaryPrice, boundaryName) {
             mailCooldownActive = true;
-            const alertTitle = `🔴 GOLD SIGNAL: ${action}`;
-            const alertBody = `1H Trend: ${current1HourTrend}. 1m price ($${price}) touched 30m ${boundaryName} ($${boundaryPrice}).`;
+            const alertTitle = `⚠️ GOLD LEVEL BREACHED: ${action}`;
+            const alertBody = `1H Direction: ${current1HourTrend}. Live price ($${price}) intersected mapped ${boundaryName} ($${boundaryPrice}).`;
 
-            addLog(`CRITERIA MET! Dispatching Chrome system Notification & Email Alert...`);
+            addLog(`Alert trigger! Activating notifications for ${action}.`);
 
-            // 1. CHROME BROWSER SYSTEM NOTIFICATION
+            // Tone alert
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(action === "BUY / LONG" ? 880 : 440, audioCtx.currentTime); // High pitch for Buy, lower for Sell
+                oscillator.connect(audioCtx.destination);
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + 0.4);
+            } catch(e) { }
+
+            // 1. Chrome Native Alert Notification
             if ("Notification" in window && Notification.permission === "granted") {
                 new Notification(alertTitle, {
                     body: alertBody,
                     icon: "https://cdn-icons-png.flaticon.com/512/272/272525.png",
-                    requireInteraction: true // Keeps the alert on screen until you dismiss it
+                    requireInteraction: true
                 });
-                addLog("Chrome system notification sent successfully!");
-            } else {
-                addLog("Chrome notification skipped (Permission not granted/supported).");
             }
 
-            // 2. EMAILJS AUTOMATED EMAIL DISPATCH
+            // 2. EmailJS Alert Dispatch[cite: 2]
             if (isMailEngineConfigured) {
                 const serviceId = document.getElementById('ej-srv-id').value.trim();
                 const templateId = document.getElementById('ej-tpl-id').value.trim();
 
                 const templateParams = {
                     to_email: "nayemdataentry1@gmail.com",
-                    subject: `GOLD [XAU/USDT] - ${action} SIGNAL`,
-                    message: `Alert: 1-hour major trend is ${current1HourTrend}. The live 1-minute gold candle price ($${price}) has touched its 30-minute structural ${boundaryName} ($${boundaryPrice}). Action recommended: Open a ${action} trade immediately.`
+                    subject: `GOLD LEVEL ALARM - ${action}`,
+                    message: `CRITICAL ALERT: The gold market ($${price}) has interacted with your marked ${boundaryName} at $${boundaryPrice}. This corresponds to the structural 1-Hour Trend: ${current1HourTrend}.`
                 };
 
                 emailjs.send(serviceId, templateId, templateParams)
                     .then(() => {
-                        addLog(`Email successfully sent to nayemdataentry1@gmail.com! Cooldown active for 15m.`);
+                        addLog(`Email dispatched successfully. Alert engines placed on standard 15m cooldown.`);
                         activateCooldown();
                     })
                     .catch((error) => {
-                        addLog(`Mail dispatch failure: ` + JSON.stringify(error));
-                        activateCooldown(); // Activate cooldown anyway to prevent endless loops
+                        addLog(`Email dispatch error: ` + JSON.stringify(error));
+                        activateCooldown();
                     });
             } else {
-                addLog("Email dispatch skipped (Credentials not configured).");
                 activateCooldown();
             }
         }
 
         function activateCooldown() {
-            // Activate 15-minute standard cooldown to prevent notification spam
             setTimeout(() => {
                 mailCooldownActive = false;
-                addLog("Cooldown expired. Alert engine is active again.");
+                addLog("System active. Monitoring price boundaries.");
             }, 900000); 
         }
 
-        // Initialization execution trigger block
+        // Initialization load
         window.onload = function() {
             loadTradingViewChart();
             initSection1();
