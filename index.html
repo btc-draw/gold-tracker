@@ -157,7 +157,7 @@
         .text-green { color: var(--bullish-green); }
         .text-red { color: var(--bearish-red); }
 
-        /* TradingView Embedded Container Frame */
+        /* TradingView Embedded Container Frame - Cleaned up to show ONLY the chart */
         .tv-wrapper {
             height: 450px;
             width: 100%;
@@ -286,9 +286,9 @@
 
     <div class="container">
         
-        <!-- LIVE INTERACTIVE TRADINGVIEW CHART -->
+        <!-- SECTION 1: LIVE CHART - STREAMLINED VIEW -->
         <div class="section-card">
-            <h2>XAU/USDT Live Interactive Chart (With Sketch Tools)</h2>
+            <h2>XAU/USDT Live Chart (Clean View)</h2>
             <div class="tv-wrapper">
                 <!-- TradingView Widget BEGIN -->
                 <div id="tradingview_xau_chart" style="height: 100%; width: 100%;"></div>
@@ -469,7 +469,7 @@
     <!-- Script tags containing implementation for layout generation and widget loading -->
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script>
-        // --- LIVE INTERACTIVE TRADINGVIEW CHART INTEGRATION ---
+        // --- LIVE INTERACTIVE TRADINGVIEW CHART INTEGRATION (OPTIMIZED FOR CLEAN VIEW) ---
         function loadTradingViewChart() {
             new TradingView.widget({
                 "width": "100%",
@@ -482,8 +482,11 @@
                 "locale": "en",
                 "toolbar_bg": "#1e293b",
                 "enable_publishing": false,
-                "hide_side_toolbar": false,
-                "allow_symbol_change": true,
+                "hide_side_toolbar": true,   // Hides drawing/sketch tools panel
+                "hide_top_toolbar": true,    // Hides search bar, intervals, indicator buttons, etc.
+                "hide_legend": true,         // Hides volume labels and indicator value displays in top-left
+                "save_image": false,         // Disables the screenshot icon
+                "allow_symbol_change": false, // Locks chart specifically to XAUUSD
                 "container_id": "tradingview_xau_chart"
             });
         }
