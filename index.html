@@ -3,50 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XAU/USD Professional Mobile & Desktop Engine</title>
+    <title>XAU/USD Pro Terminal | Glassmorphism Edition</title>
+    
+    <!-- Import Modern Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --bg: #060913;
-            --card: #0b1120;
-            --gold: #f59e0b;
-            --border: #1e293b;
-            --text: #f1f5f9;
-            --muted: #64748b;
+            /* Premium Dark Glass Theme Variables */
+            --bg-base: #020617;
+            --bg-gradient: radial-gradient(circle at top right, #0f172a, #020617 70%);
+            --card-bg: rgba(30, 41, 59, 0.45);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --gold: #fbbf24;
+            --gold-glow: rgba(251, 191, 36, 0.2);
+            --accent-cyan: #38bdf8;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
             --green: #10b981;
-            --red: #ef4444;
+            --red: #f43f5e;
+            --purple: #a855f7;
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         body {
-            background-color: var(--bg);
-            color: var(--text);
-            padding: 12px;
-            overflow-y: auto; /* Universal top to down scrollability */
+            background: var(--bg-base);
+            background-image: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-main);
+            padding: 16px;
+            overflow-y: auto;
             min-height: 100vh;
         }
 
         @media (min-width: 768px) {
-            body { padding: 25px; }
+            body { padding: 30px; }
+        }
+
+        /* Glassmorphism Mixin Utility */
+        .glass-panel {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            box-shadow: var(--glass-shadow);
         }
 
         /* Fully Responsive Header Frame */
         header {
-            background: linear-gradient(135deg, #0d1527 0%, var(--card) 100%);
-            border: 1px solid var(--border);
-            border-top: 3px solid var(--gold);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            gap: 16px;
+            border-top: 4px solid var(--gold);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            opacity: 0.5;
         }
 
         @media (min-width: 600px) {
@@ -54,31 +82,46 @@
                 flex-direction: row;
                 justify-content: space-between;
                 align-items: center;
-                padding: 20px;
+                padding: 24px 30px;
             }
         }
 
         .brand h1 {
-            font-size: 1.3rem;
-            color: var(--gold);
-            letter-spacing: 0.5px;
+            font-size: 1.4rem;
+            color: var(--text-main);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand h1::before {
+            content: '';
+            display: block;
+            width: 12px;
+            height: 12px;
+            background: var(--gold);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--gold);
         }
 
         @media (min-width: 768px) {
-            .brand h1 { font-size: 1.7rem; }
+            .brand h1 { font-size: 1.8rem; }
         }
 
         .brand p {
-            font-size: 0.8rem;
-            color: var(--muted);
-            margin-top: 2px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+            font-weight: 400;
         }
 
         .refresh-module {
-            background: rgba(245, 158, 11, 0.04);
-            border: 1px solid rgba(245, 158, 11, 0.15);
-            padding: 8px 14px;
-            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--card-border);
+            padding: 10px 18px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -86,237 +129,325 @@
         }
 
         .refresh-timer {
-            font-weight: bold;
-            color: var(--green);
+            font-weight: 700;
+            color: var(--accent-cyan);
             font-family: monospace;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
+            text-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
         }
 
         /* Continuous Vertical Stack Grid Matrix */
         .matrix-stack {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            margin-bottom: 25px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        @media (min-width: 1200px) {
+            .matrix-stack { grid-template-columns: 1fr 1fr; }
         }
 
         .chart-frame {
-            background-color: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            height: 420px; /* Highly viewable on mobile & desktop layout arrays */
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            height: 450px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .chart-frame:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+            border-color: rgba(255, 255, 255, 0.15);
         }
 
         @media (min-width: 768px) {
-            .chart-frame { height: 500px; }
+            .chart-frame { height: 550px; }
         }
 
         .chart-title {
-            background-color: #0f172a;
-            padding: 12px 16px;
-            font-size: 0.85rem;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 14px 20px;
+            font-size: 0.9rem;
             font-weight: 600;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid var(--card-border);
         }
 
         .badge {
-            background: rgba(245, 158, 11, 0.12);
+            background: var(--gold-glow);
             color: var(--gold);
-            padding: 3px 8px;
-            border-radius: 4px;
+            padding: 4px 10px;
+            border-radius: 6px;
             font-size: 0.75rem;
-            font-weight: bold;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
 
         .view-wrapper {
             flex: 1;
             width: 100%;
             height: 100%;
+            background: #000;
         }
 
-        /* Direct Embedded Live Support & Resistance Level Badges */
         .level-strip {
-            background-color: #090d16;
-            border-top: 1px solid var(--border);
-            padding: 10px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid var(--card-border);
+            padding: 12px 20px;
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 20px;
             font-size: 0.85rem;
+        }
+
+        .level-strip span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .level-strip span strong {
             font-family: monospace;
-            font-size: 0.9rem;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2px 6px;
+            border-radius: 4px;
         }
 
         /* Grid Framework for News & Clock Utilities */
         .info-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 20px;
+            gap: 25px;
         }
 
-        @media (min-width: 992px) {
+        @media (min-width: 1024px) {
             .info-grid {
-                grid-template-columns: 1.2fr 0.8fr;
+                grid-template-columns: 1fr 1.2fr;
             }
         }
 
         .info-card {
-            background-color: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            padding: 24px;
         }
 
         .info-card h2 {
-            color: var(--gold);
-            font-size: 1.15rem;
-            margin-bottom: 15px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid var(--border);
+            color: var(--text-main);
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        /* News Layout Array */
         .news-item {
-            padding: 12px 0;
-            border-bottom: 1px solid #1e293b;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: padding-left 0.2s ease;
+        }
+        .news-item:hover {
+            padding-left: 8px;
         }
         .news-item:last-child {
             border-bottom: none;
             padding-bottom: 0;
         }
         .news-meta {
-            font-size: 0.7rem;
-            color: var(--gold);
-            margin-bottom: 4px;
-            font-weight: bold;
-            letter-spacing: 0.5px;
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            margin-bottom: 6px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
         }
         .news-headline {
-            font-size: 0.95rem;
+            font-size: 1.05rem;
             font-weight: 600;
-            margin-bottom: 4px;
-            line-height: 1.3;
+            margin-bottom: 8px;
+            line-height: 1.4;
+            color: var(--text-main);
         }
         .news-details {
-            font-size: 0.85rem;
-            color: var(--muted);
-            line-height: 1.4;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
         }
 
-        /* Market Table Adjustments */
+        /* Enhanced Market Table Adjustments */
         .session-table-wrapper {
             width: 100%;
-            overflow-x: auto; /* Prevent table breakages on tiny mobile viewports */
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+            background: rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
         }
 
         .session-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.85rem;
-            min-width: 280px;
+            font-size: 0.9rem;
+            min-width: 400px;
         }
 
         .session-table th, .session-table td {
-            padding: 10px;
+            padding: 12px 14px;
             text-align: left;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .session-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.03);
         }
 
         .session-table th {
-            color: var(--muted);
+            color: var(--text-muted);
             text-transform: uppercase;
-            font-size: 0.7rem;
-            font-weight: bold;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .vol-low { color: var(--text-muted); font-size: 0.8rem; font-weight: 600; }
+        .vol-med { color: var(--accent-cyan); font-size: 0.8rem; font-weight: 600; }
+        .vol-high { color: var(--gold); font-size: 0.8rem; font-weight: 600; }
+        .vol-extreme { color: var(--red); font-size: 0.8rem; font-weight: 700; text-shadow: 0 0 5px rgba(244, 63, 94, 0.4); }
+
+        /* Best Times to Trade Windows */
+        .best-times-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .prime-window {
+            padding: 16px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 4px solid;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .prime-window.overlap {
+            border-left-color: var(--gold);
+            background: linear-gradient(90deg, rgba(251, 191, 36, 0.08) 0%, transparent 100%);
+        }
+
+        .prime-window.london {
+            border-left-color: var(--accent-cyan);
+            background: linear-gradient(90deg, rgba(56, 189, 248, 0.05) 0%, transparent 100%);
+        }
+
+        .prime-window h3 {
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .prime-window.overlap h3 { color: var(--gold); }
+        .prime-window.london h3 { color: var(--accent-cyan); }
+
+        .prime-window p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .prime-time-badge {
+            display: inline-block;
+            font-family: monospace;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: var(--text-main);
+            margin-top: 8px;
         }
     </style>
 </head>
 <body>
 
-    <!-- Responsive Navigation/Control Header Frame -->
-    <header>
+    <header class="glass-panel">
         <div class="brand">
-            <h1>XAU/USD Live Multi-Interval Terminal</h1>
+            <h1>XAU/USD Multi-Interval Terminal</h1>
             <p>Clean Operational Workspace Optimized for Cross-Platform Sync</p>
         </div>
         <div class="refresh-module">
-            <span style="font-size: 0.75rem; color: var(--muted);">AUTO-REFRESH:</span>
+            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px;">SYS_REFRESH</span>
             <span id="timer-display" class="refresh-timer">60s</span>
         </div>
     </header>
 
-    <!-- Master Vertical Framework Stack Container -->
     <div class="matrix-stack">
-        
         <!-- FRAME 1: 1-Minute Target Box -->
-        <div class="chart-frame">
+        <div class="chart-frame glass-panel">
             <div class="chart-title">
                 <span>Micro Momentum Vector Feed</span>
-                <span class="badge">1 Minute Timeframe (M1)</span>
+                <span class="badge">M1</span>
             </div>
             <div class="view-wrapper" id="pane_m1"></div>
             <div class="level-strip">
-                <span><span style="color: var(--red)">▼ Micro Resistance:</span> <strong style="color: var(--text)">$4,065.00</strong></span>
-                <span><span style="color: var(--green)">▲ Micro Support:</span> <strong style="color: var(--text)">$4,038.00</strong></span>
+                <span><span style="color: var(--red)">▼ Res:</span> <strong style="color: var(--text-main)">$4,065.00</strong></span>
+                <span><span style="color: var(--green)">▲ Sup:</span> <strong style="color: var(--text-main)">$4,038.00</strong></span>
             </div>
         </div>
 
         <!-- FRAME 2: 5-Minute Target Box -->
-        <div class="chart-frame">
+        <div class="chart-frame glass-panel">
             <div class="chart-title">
                 <span>Precision Trigger Confirmation Box</span>
-                <span class="badge">5 Minute Timeframe (M5)</span>
+                <span class="badge">M5</span>
             </div>
             <div class="view-wrapper" id="pane_m5"></div>
             <div class="level-strip">
-                <span><span style="color: var(--red)">▼ Local Ceiling:</span> <strong style="color: var(--text)">$4,080.00</strong></span>
-                <span><span style="color: var(--green)">▲ Local Floor:</span> <strong style="color: var(--text)">$4,035.00</strong></span>
+                <span><span style="color: var(--red)">▼ Ceiling:</span> <strong style="color: var(--text-main)">$4,080.00</strong></span>
+                <span><span style="color: var(--green)">▲ Floor:</span> <strong style="color: var(--text-main)">$4,035.00</strong></span>
             </div>
         </div>
 
         <!-- FRAME 3: 1-Hour Target Box -->
-        <div class="chart-frame">
+        <div class="chart-frame glass-panel">
             <div class="chart-title">
-                <span>Intraday Core Order-Flow Trend Matrix</span>
-                <span class="badge">1 Hour Timeframe (H1)</span>
+                <span>Intraday Core Order-Flow Matrix</span>
+                <span class="badge">H1</span>
             </div>
             <div class="view-wrapper" id="pane_h1"></div>
             <div class="level-strip">
-                <span><span style="color: var(--red)">▼ Intraday Resistance:</span> <strong style="color: var(--text)">$4,120.00</strong></span>
-                <span><span style="color: var(--green)">▲ Intraday Support:</span> <strong style="color: var(--text)">$4,005.00</strong></span>
+                <span><span style="color: var(--red)">▼ Intraday Res:</span> <strong style="color: var(--text-main)">$4,120.00</strong></span>
+                <span><span style="color: var(--green)">▲ Intraday Sup:</span> <strong style="color: var(--text-main)">$4,005.00</strong></span>
             </div>
         </div>
 
         <!-- FRAME 4: 4-Hour Target Box -->
-        <div class="chart-frame">
+        <div class="chart-frame glass-panel">
             <div class="chart-title">
                 <span>Macro Swing Supply & Demand Floor</span>
-                <span class="badge">4 Hour Timeframe (H4)</span>
+                <span class="badge">H4</span>
             </div>
             <div class="view-wrapper" id="pane_h4"></div>
             <div class="level-strip">
-                <span><span style="color: var(--red)">▼ Macro Structural Wall:</span> <strong style="color: var(--text)">$4,155.00</strong></span>
-                <span><span style="color: var(--green)">▲ Macro Structural Base:</span> <strong style="color: var(--text)">$3,960.00</strong></span>
+                <span><span style="color: var(--red)">▼ Macro Wall:</span> <strong style="color: var(--text-main)">$4,155.00</strong></span>
+                <span><span style="color: var(--green)">▲ Macro Base:</span> <strong style="color: var(--text-main)">$3,960.00</strong></span>
             </div>
         </div>
-
     </div>
 
     <!-- Info Section Row -->
     <div class="info-grid">
         
         <!-- Live Gold Fundamental News Updates Module -->
-        <div class="info-card">
+        <div class="info-card glass-panel">
             <h2>📰 Top Gold Fundamental Intelligence</h2>
             
             <div class="news-item">
@@ -338,50 +469,64 @@
             </div>
         </div>
 
-        <!-- Global Session Clocks Translated to Bangladesh Time -->
-        <div class="info-card">
-            <h2>⏰ Session Windows (Bangladesh Time - BST)</h2>
+        <!-- Global Session Clocks & Best Trading Times -->
+        <div class="info-card glass-panel">
+            <h2>🌍 Sessions & Best Trade Windows (BST)</h2>
+            
             <div class="session-table-wrapper">
                 <table class="session-table">
                     <thead>
                         <tr>
-                            <th>Exchange Hub</th>
-                            <th>BST Open</th>
-                            <th>BST Close</th>
+                            <th>Market Hub</th>
+                            <th>BST Hours</th>
+                            <th>XAU Volatility</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td><strong>Sydney Session</strong></td>
-                            <td>04:00 AM</td>
-                            <td>01:00 PM</td>
+                            <td><strong>Sydney</strong></td>
+                            <td>04:00 AM - 01:00 PM</td>
+                            <td class="vol-low">Low (Ranging)</td>
                         </tr>
                         <tr>
-                            <td><strong>Tokyo Open</strong> (Asian Base)</td>
-                            <td>06:00 AM</td>
-                            <td>03:00 PM</td>
+                            <td><strong>Tokyo (Asia)</strong></td>
+                            <td>06:00 AM - 03:00 PM</td>
+                            <td class="vol-med">Medium (Consolidation)</td>
                         </tr>
                         <tr>
-                            <td><strong>London Open</strong> (European Volume)</td>
-                            <td>01:00 PM</td>
-                            <td>10:00 PM</td>
+                            <td><strong>London (Europe)</strong></td>
+                            <td>01:00 PM - 10:00 PM</td>
+                            <td class="vol-high">High (Trend Formation)</td>
                         </tr>
                         <tr>
-                            <td><strong>New York Open</strong> (US Heavy Drive)</td>
-                            <td>06:00 PM</td>
-                            <td>03:00 AM</td>
+                            <td><strong>New York (US)</strong></td>
+                            <td>06:00 PM - 03:00 AM</td>
+                            <td class="vol-extreme">Max (Major Moves)</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <div style="margin-top: 15px; font-size: 0.8rem; color: var(--muted); line-height: 1.4;">
-                💡 <strong>Scalper Tip:</strong> The sharpest, cleanest price breaks occur when Asian session lows or highs are aggressively hunted right during the <strong>London Open (01:00 PM BST)</strong> overlap sequence!
+
+            <!-- Bangladesh Focused Trading Windows -->
+            <div class="best-times-container">
+                <div class="prime-window overlap">
+                    <h3>🔥 The Golden Overlap (NY + London)</h3>
+                    <p>The most liquid and volatile time of day. Major US economic data drops here, causing massive breakouts and massive pips for XAU/USD.</p>
+                    <div class="prime-time-badge">06:00 PM - 10:00 PM BST</div>
+                </div>
+
+                <div class="prime-window london">
+                    <h3>⚡ London Open Breakouts</h3>
+                    <p>European institutional volume enters the market. Excellent time to trade break-of-structure setups against the Asian session highs/lows.</p>
+                    <div class="prime-time-badge">01:00 PM - 04:00 PM BST</div>
+                </div>
             </div>
+
         </div>
 
     </div>
 
-    <!-- TradingView Core Component Embed Script Loaders -->
+    <!-- TradingView Script Loaders -->
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script type="text/javascript">
         function loadResponsiveWidget(containerDiv, interval, visualRange) {
@@ -400,18 +545,16 @@
                 "container_id": containerDiv,
                 "range": visualRange,
                 "studies": [], 
-                "loading_screen": { "backgroundColor": "#0b1120" }
+                "loading_screen": { "backgroundColor": "#020617" }
             });
         }
 
-        // Initialize embedded layers synchronously on document processing
         window.addEventListener('DOMContentLoaded', () => {
             loadResponsiveWidget("pane_m1", "1", "1d");
             loadResponsiveWidget("pane_m5", "5", "1d");
             loadResponsiveWidget("pane_h1", "60", "2d");
             loadResponsiveWidget("pane_h4", "240", "5d");
 
-            // 60-Second Dynamic Auto-Refresh Loop Engine Tracker
             let countdown = 60;
             const timerEl = document.getElementById("timer-display");
 
